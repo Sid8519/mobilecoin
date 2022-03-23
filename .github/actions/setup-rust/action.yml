@@ -1,0 +1,75 @@
+name: Set up Rust and associated tools
+
+inputs:
+  env_file:
+    description: Path to write env vars
+    type: string
+    required: true
+  components:
+    description: Comma-separated list of the additional components to install, e.g. 'clippy, rustfmt'
+    type: string
+    default:
+    required: false
+  default:
+    description: Set installed toolchain as a default toolchain
+    type: boolean
+    default: true
+    required: false
+  profile:
+    description: Rust toolchain profile
+    type: string
+    default: minimal
+    required: false
+  sccache:
+    description: Whether to use sccache
+    type: boolean
+    default: true
+    required: false
+
+runs:
+  using: composite
+  steps:
+    - name: Cache Cargo dirs
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+        key: v1-cargo-${{ runner.os }}-${{ hashFiles('rust-toolchain') }}-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          v1-cargo-${{ runner.os }}-${{ hashFiles('rust-toolchain') }}
+          v1-cargo-${{ runner.os }}
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        # Honors rust-toolchain file, installing that version.
+        components: ${{ inputs.components }}
+        default: ${{ inputs.default }}
+        profile: ${{ inputs.profile }}
+    - name: Set up dependency cache
+      uses: Swatinem/rust-cache@v1
+    - name: Install cargo-cache
+      uses: actions-rs/install@v0.1
+      with:
+        crate: cargo-cache
+        use-tool-cache: true
+    - name: Set up env vars
+      shell: bash
+      run: |
+        ENV_FILE="${{ inputs.env_file }}"
+        # build config
+        echo 'IAS_MODE=DEV' >> $ENV_FILE
+        echo 'SGX_MODE=SW' >> $ENV_FILE
+        # test/run config
+        echo 'RUST_BACKTRACE=1' >> $ENV_FILE
+        echo 'SKIP_SLOW_TESTS=1' >> $ENV_FILE
+
+        HOST_TARGET_TRIPLE="$(rustc -Vv | sed -n 's/^host: //p')"
+        echo "HOST_TARGET_TRIPLE=\"$HOST_TARGET_TRIPLE\"" >> $ENV_FILE
+    - name: Setup sccache
+      if: ${{ inputs.sccache }}
+      uses: ./.github/actions/sccache
+      with:
+        env_file: ${{ inputs.env_file }}

@@ -1,0 +1,168 @@
+name: Build and Lint
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - main
+      - develop
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-dev:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Setup
+        uses: ./.github/actions/setup-rust
+        with:
+          env_file: ${{ env.GITHUB_ENV }}
+      - name: Cargo build (SW/IAS dev)
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --frozen --target "${{ env.HOST_TARGET_TRIPLE }}" -j 4
+
+  build-prod:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Setup
+        uses: ./.github/actions/setup-rust
+        with:
+          env_file: ${{ env.GITHUB_ENV }}
+      - name: Cargo build (HW/IAS prod)
+        env:
+          SGX_MODE: HW
+          IAS_MODE: PROD
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --frozen --target "${{ env.HOST_TARGET_TRIPLE }}" -j 4
+
+  # This effectively inline `tools/lint.sh` for better GH integration.
+  lint-rust:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        workspace:
+          # via `grep -irl '\[workspace\]' **/Cargo.toml | xargs dirname`
+          - .
+          - consensus/enclave/trusted
+          - fog/ingest/enclave/trusted
+          - fog/ledger/enclave/trusted
+          - fog/view/enclave/trusted
+    defaults:
+      run:
+        working-directory: ${{ matrix.workspace }}
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Setup
+        uses: ./.github/actions/setup-rust
+        with:
+          env_file: ${{ env.GITHUB_ENV }}
+          components: rustfmt, clippy
+      - name: Check formatting
+        # Warnings and errors issued by cargo will be displayed in GitHub UI
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --all -- --check
+      - name: Clippy
+        uses: actions-rs/clippy-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          args: --all --all-features
+      - name: Install cargo-sort
+        uses: actions-rs/install@v0.1
+        with:
+          crate: cargo-sort
+          use-tool-cache: true
+      - name: Check Cargo.toml sorted
+        # Warnings and errors issued by cargo will be displayed in GitHub UI
+        uses: actions-rs/cargo@v1
+        with:
+          command: sort
+          args: --check --workspace --grouped
+      - name: Check dirty git
+        uses: ./.github/actions/check-dirty-git
+
+  lint-go:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/Library/Caches/go-build
+            ~/go/pkg/mod
+          key: v1-go-${{ runner.os }}-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            v1-go-${{ runner.os }}
+      - name: Set up Go
+        uses: actions/setup-go@v2
+      - name: Lint Go code
+        run: cd go-grpc-gateway && ./lint.sh
+      - name: Check dirty git
+        uses: ./.github/actions/check-dirty-git
+
+  cbindgen:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Setup
+        uses: ./.github/actions/setup-rust
+        with:
+          env_file: ${{ env.GITHUB_ENV }}
+      - name: Install cbindgen
+        uses: actions-rs/install@v0.1
+        with:
+          crate: cbindgen
+          use-tool-cache: true
+      - run: make cbindgen
+        working-directory: libmobilecoin
+      - name: Check dirty git
+        uses: ./.github/actions/check-dirty-git
+
+  docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Setup
+        uses: ./.github/actions/setup-rust
+        with:
+          env_file: ${{ env.GITHUB_ENV }}
+      - name: Get latest CMake and ninja
+        # Using 'latest' branch, the most recent CMake and ninja are installed.
+        uses: lukka/get-cmake@latest
+      - name: Generate docs
+        run: cargo doc --no-deps && tar -C target -czvf /tmp/doc.tgz doc/
+      - name: Store docs
+        uses: actions/upload-artifact@v3
+        with:
+          name: doc.tgz
+          path: /tmp/doc.tgz
+      - name: Check dirty git
+        uses: ./.github/actions/check-dirty-git
+
+# via https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-only-cancel-in-progress-jobs-or-runs-for-the-current-workflow
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true

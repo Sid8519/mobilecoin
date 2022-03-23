@@ -1,0 +1,40 @@
+name: Set up sccache
+
+inputs:
+  env_file:
+    description: Path to write env vars
+    type: string
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Install sccache
+      uses: actions-rs/install@v0.1
+      with:
+        crate: sccache
+        use-tool-cache: true
+    - name: Cache sccache dir
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/sccache
+        key: v1-sccache-${{ runner.os }}-${{ hashFiles('rust-toolchain') }}-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          v1-sccache-${{ runner.os }}-${{ hashFiles('rust-toolchain') }}
+          v1-sccache-${{ runner.os }}
+    - name: Set up env vars
+      shell: bash
+      run: |
+        # Set up env vars
+        ENV_FILE="${{ inputs.env_file }}"
+        echo 'RUSTC_WRAPPER=sccache' >> $ENV_FILE
+        echo 'CMAKE_C_COMPILER_LAUNCHER=sccache' >> $ENV_FILE
+        echo 'CMAKE_CXX_COMPILER_LAUNCHER=sccache' >> $ENV_FILE
+        # sccache doesn't support incremental building
+        echo 'CARGO_INCREMENTAL=0' >> $ENV_FILE
+        # Set cache dir explicitly so that all platforms use the same location
+        echo 'SCCACHE_DIR=$HOME/.cache/sccache' >> $ENV_FILE
+        # Tune some params
+        echo 'SCCACHE_IDLE_TIMEOUT=1200' >> $ENV_FILE
+        echo 'SCCACHE_CACHE_SIZE=1G' >> $ENV_FILE
+        echo 'SCCACHE_ERROR_LOG=/tmp/sccache.log' >> $ENV_FILE
