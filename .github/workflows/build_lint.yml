@@ -48,6 +48,7 @@ jobs:
   lint-rust:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         workspace:
           # via `grep -irl '\[workspace\]' **/Cargo.toml | xargs dirname`
