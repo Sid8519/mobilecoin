@@ -54,6 +54,10 @@ runs:
     - name: Set up env vars
       shell: bash
       run: |
+        # "You can make an environment variable available to any subsequent steps
+        # in a workflow job by defining or updating the environment variable
+        # and writing this to the GITHUB_ENV environment file."
+        # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
         ENV_FILE="$GITHUB_ENV"
         # build config
         echo 'IAS_MODE=DEV' >> $ENV_FILE
@@ -69,5 +73,3 @@ runs:
     - name: Setup sccache
       if: ${{ inputs.sccache }}
       uses: ./.github/actions/sccache
-      with:
-        env_file: ${{ inputs.env_file }}
