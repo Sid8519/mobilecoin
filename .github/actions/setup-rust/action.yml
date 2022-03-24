@@ -34,11 +34,6 @@ runs:
         profile: ${{ inputs.profile }}
     - name: Set up dependency cache
       uses: Swatinem/rust-cache@v1
-    - name: Install cargo-cache
-      uses: actions-rs/install@v0.1
-      with:
-        crate: cargo-cache
-        use-tool-cache: true
     - name: Set up env vars
       shell: bash
       run: |
