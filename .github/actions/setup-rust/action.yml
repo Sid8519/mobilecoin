@@ -29,10 +29,10 @@ runs:
       uses: actions/cache@v3
       with:
         path: |
-          ~/.cargo/bin/
-          ~/.cargo/registry/index/
-          ~/.cargo/registry/cache/
-          ~/.cargo/git/db/
+          /home/runner/.cargo/bin/
+          /home/runner/.cargo/registry/index/
+          /home/runner/.cargo/registry/cache/
+          /home/runner/.cargo/git/db/
         key: v1-cargo-${{ runner.os }}-${{ hashFiles('rust-toolchain') }}-${{ hashFiles('**/Cargo.lock') }}
         restore-keys: |
           v1-cargo-${{ runner.os }}-${{ hashFiles('rust-toolchain') }}

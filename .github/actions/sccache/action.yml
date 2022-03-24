@@ -11,7 +11,7 @@ runs:
     - name: Cache sccache dir
       uses: actions/cache@v3
       with:
-        path: ~/.cache/sccache
+        path: /home/runner/.cache/sccache
         key: v1-sccache-${{ runner.os }}-${{ hashFiles('rust-toolchain') }}-${{ hashFiles('**/Cargo.lock') }}
         restore-keys: |
           v1-sccache-${{ runner.os }}-${{ hashFiles('rust-toolchain') }}

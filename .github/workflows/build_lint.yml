@@ -101,9 +101,9 @@ jobs:
       - uses: actions/cache@v3
         with:
           path: |
-            ~/.cache/go-build
-            ~/Library/Caches/go-build
-            ~/go/pkg/mod
+            /home/runner/.cache/go-build
+            /home/runner/Library/Caches/go-build
+            /home/runner/go/pkg/mod
           key: v1-go-${{ runner.os }}-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             v1-go-${{ runner.os }}
