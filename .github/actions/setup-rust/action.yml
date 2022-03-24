@@ -1,10 +1,6 @@
 name: Set up Rust and associated tools
 
 inputs:
-  env_file:
-    description: Path to write env vars
-    type: string
-    required: true
   components:
     description: Comma-separated list of the additional components to install, e.g. 'clippy, rustfmt'
     type: string
@@ -58,7 +54,7 @@ runs:
     - name: Set up env vars
       shell: bash
       run: |
-        ENV_FILE="${{ inputs.env_file }}"
+        ENV_FILE="$GITHUB_ENV"
         # build config
         echo 'IAS_MODE=DEV' >> $ENV_FILE
         echo 'SGX_MODE=SW' >> $ENV_FILE

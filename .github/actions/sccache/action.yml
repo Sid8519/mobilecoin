@@ -1,11 +1,5 @@
 name: Set up sccache
 
-inputs:
-  env_file:
-    description: Path to write env vars
-    type: string
-    required: true
-
 runs:
   using: composite
   steps:
@@ -26,7 +20,7 @@ runs:
       shell: bash
       run: |
         # Set up env vars
-        ENV_FILE="${{ inputs.env_file }}"
+        ENV_FILE="$GITHUB_ENV"
         echo 'RUSTC_WRAPPER=sccache' >> $ENV_FILE
         echo 'CMAKE_C_COMPILER_LAUNCHER=sccache' >> $ENV_FILE
         echo 'CMAKE_CXX_COMPILER_LAUNCHER=sccache' >> $ENV_FILE
