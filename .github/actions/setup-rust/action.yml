@@ -9,7 +9,7 @@ inputs:
   default:
     description: Set installed toolchain as a default toolchain
     type: boolean
-    default: true
+    default: false
     required: false
   profile:
     description: Rust toolchain profile
