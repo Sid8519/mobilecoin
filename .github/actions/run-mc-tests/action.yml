@@ -44,9 +44,9 @@ runs:
                 | cargo2junit > $TMP_DIR/results.xml \
                 || true
             }
-      - name: Collect core dumps
-        uses: actions/upload-artifact@v3
-        with:
-          name: core_dumps
-          path: core.*
-          if-no-files-found: ignore
+    - name: Collect core dumps
+      uses: actions/upload-artifact@v3
+      with:
+        name: core_dumps
+        path: core.*
+        if-no-files-found: ignore
