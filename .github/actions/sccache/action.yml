@@ -30,5 +30,8 @@ runs:
         echo 'SCCACHE_DIR=$HOME/.cache/sccache' >> $ENV_FILE
         # Tune some params
         echo 'SCCACHE_IDLE_TIMEOUT=1200' >> $ENV_FILE
-        echo 'SCCACHE_CACHE_SIZE=1G' >> $ENV_FILE
+        echo 'SCCACHE_CACHE_SIZE=10G' >> $ENV_FILE
         echo 'SCCACHE_ERROR_LOG=/tmp/sccache.log' >> $ENV_FILE
+    - name: Start sccache server
+      shell: bash
+      run: sccache --start-server
