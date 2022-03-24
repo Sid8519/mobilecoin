@@ -1,0 +1,52 @@
+name: Set up Rust and associated tools
+
+inputs:
+  test_command:
+    description: Test command
+    type: string
+    required: true
+  tmp_dir:
+    description: Temp directory for test output
+    type: string
+    required: false
+    default: /tmp/mc-test-results
+
+runs:
+  using: composite
+  steps:
+    - name: Install cargo2junit
+      uses: actions-rs/install@v0.1
+      with:
+        crate: cargo2junit
+        use-tool-cache: true
+    - name: Run MC tests
+      shell: bash
+      run: |
+        # tell the operating system to remove the file size limit on core dump files
+        ulimit -c unlimited
+        mkdir -p $TMP_DIR
+
+        # Run tests, then convert the cargo json results into junit xml format.
+        #
+        # Note: Using curly braces ensures that the conversion is run even if the tests fail,
+        # while still allowing the exit code from the tests to be propagated. Using `tee` to
+        # pipe the output to a file before converting ensures that the tests are not
+        # interrupted if conversion fails. `|| true` is added so that the test as a whole does
+        # not fail even if conversion fails. This is especially necessary because the
+        # conversion tool must parse all test output, including log output, in order to parse
+        # the test results, and unfortunately Cargo does not always output the test results in
+        # such a way that is cleanly parsable.
+        ${{ inputs.test_command }}  >> -- \
+            -Zunstable-options --format json --report-time \
+          | {
+              tee $TMP_DIR/output.log
+              cat $TMP_DIR/output.log \
+                | cargo2junit > $TMP_DIR/results.xml \
+                || true
+            }
+      - name: Collect core dumps
+        uses: actions/upload-artifact@v3
+        with:
+          name: core_dumps
+          path: core.*
+          if-no-files-found: ignore
