@@ -21,6 +21,8 @@ runs:
         use-tool-cache: true
     - name: Run MC tests
       shell: bash
+      env:
+        TMP_DIR: ${{ inputs.tmp_dir }}
       run: |
         # tell the operating system to remove the file size limit on core dump files
         ulimit -c unlimited
