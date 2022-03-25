@@ -41,19 +41,17 @@ runs:
       # and writing this to the GITHUB_ENV environment file."
       # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
       run: |
-        ENV_FILE="$GITHUB_ENV"
         # build config
-        echo 'IAS_MODE=DEV' >> $ENV_FILE
-        echo 'SGX_MODE=SW' >> $ENV_FILE
-        echo 'source /opt/intel/sgxsdk/environment' >> $ENV_FILE
+        echo 'IAS_MODE=DEV' >> $GITHUB_ENV
+        echo 'SGX_MODE=SW' >> $GITHUB_ENV
         # test/run config
-        echo 'RUST_BACKTRACE=1' >> $ENV_FILE
-        echo 'SKIP_SLOW_TESTS=1' >> $ENV_FILE
+        echo 'RUST_BACKTRACE=1' >> $GITHUB_ENV
+        echo 'SKIP_SLOW_TESTS=1' >> $GITHUB_ENV
 
         HOST_TARGET_TRIPLE="$(rustc -Vv | sed -n 's/^host: //p')"
-        echo "HOST_TARGET_TRIPLE=$HOST_TARGET_TRIPLE" >> $ENV_FILE
+        echo "HOST_TARGET_TRIPLE=$HOST_TARGET_TRIPLE" >> $GITHUB_ENV
         # Set HOST_TARGET_TRIPLE as the default build target.
-        echo "CARGO_BUILD_TARGET=$HOST_TARGET_TRIPLE" >> $ENV_FILE
+        echo "CARGO_BUILD_TARGET=$HOST_TARGET_TRIPLE" >> $GITHUB_ENV
     - name: Install SGX
       shell: bash
       run: |

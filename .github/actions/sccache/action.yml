@@ -18,20 +18,23 @@ runs:
           v1-sccache-${{ runner.os }}
     - name: Set up env vars
       shell: bash
+      # "You can make an environment variable available to any subsequent steps
+      # in a workflow job by defining or updating the environment variable
+      # and writing this to the GITHUB_ENV environment file."
+      # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
       run: |
         # Set up env vars
-        ENV_FILE="$GITHUB_ENV"
-        echo 'RUSTC_WRAPPER=sccache' >> $ENV_FILE
-        echo 'CMAKE_C_COMPILER_LAUNCHER=sccache' >> $ENV_FILE
-        echo 'CMAKE_CXX_COMPILER_LAUNCHER=sccache' >> $ENV_FILE
+        echo 'RUSTC_WRAPPER=sccache' >> $GITHUB_ENV
+        echo 'CMAKE_C_COMPILER_LAUNCHER=sccache' >> $GITHUB_ENV
+        echo 'CMAKE_CXX_COMPILER_LAUNCHER=sccache' >> $GITHUB_ENV
         # sccache doesn't support incremental building
-        echo 'CARGO_INCREMENTAL=0' >> $ENV_FILE
+        echo 'CARGO_INCREMENTAL=0' >> $GITHUB_ENV
         # Set cache dir explicitly so that all platforms use the same location
-        echo 'SCCACHE_DIR=$HOME/.cache/sccache' >> $ENV_FILE
+        echo 'SCCACHE_DIR=$HOME/.cache/sccache' >> $GITHUB_ENV
         # Tune some params
-        echo 'SCCACHE_IDLE_TIMEOUT=1200' >> $ENV_FILE
-        echo 'SCCACHE_CACHE_SIZE=10G' >> $ENV_FILE
-        echo 'SCCACHE_ERROR_LOG=/tmp/sccache.log' >> $ENV_FILE
+        echo 'SCCACHE_IDLE_TIMEOUT=1200' >> $GITHUB_ENV
+        echo 'SCCACHE_CACHE_SIZE=10G' >> $GITHUB_ENV
+        echo 'SCCACHE_ERROR_LOG=/tmp/sccache.log' >> $GITHUB_ENV
     - name: Start sccache server
       shell: bash
       run: sccache --start-server
