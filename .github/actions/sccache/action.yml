@@ -33,6 +33,3 @@ runs:
         echo 'SCCACHE_IDLE_TIMEOUT=1200' >> $GITHUB_ENV
         echo 'SCCACHE_CACHE_SIZE=10G' >> $GITHUB_ENV
         echo 'SCCACHE_ERROR_LOG=/tmp/sccache.log' >> $GITHUB_ENV
-    - name: Start sccache server
-      shell: bash
-      run: sccache --start-server
