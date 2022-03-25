@@ -25,12 +25,8 @@ runs:
 
         # Run tests, with JUnit XML output configured via .config/nextest.toml
         cargo nextest run --workspace -p "${{ inputs.package }}" -j 4 \
-          --profile ci ${{ inputs.extra_args }}
-    - name: Collect core dumps
-      uses: actions/upload-artifact@v3
-      with:
-        name: core_dumps
-        path: core.*
-        if-no-files-found: ignore
+          --profile ci --locked ${{ inputs.extra_args }}
+    - name: Upload core dumps
+      uses: ./.github/actions/upload-core-dumps
     - name: Check dirty git
       uses: ./.github/actions/check-dirty-git
