@@ -19,7 +19,6 @@ runs:
       uses: taiki-e/install-action@nextest
     - name: Run MC tests
       shell: bash
-      env:
       run: |
         # tell the operating system to remove the file size limit on core dump files
         ulimit -c unlimited

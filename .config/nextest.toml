@@ -7,5 +7,6 @@ failure-output = "immediate-final"
 status-level = "slow"
 
 [profile.ci.junit]
-# Output a JUnit report under target/nextest/ci/junit.xml
+# Output a JUnit report under `target/nextest/ci/junit.xml`.
+# See https://nexte.st/book/junit.html for more details.
 path = "junit.xml"
