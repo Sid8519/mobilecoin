@@ -25,7 +25,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: build
-          args: --frozen -j 4
+          args: -j 4
 
   build-prod:
     runs-on: ubuntu-latest
@@ -42,7 +42,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: build
-          args: --frozen -j 4
+          args: -j 4
 
   # This effectively inline `tools/lint.sh` for better GH integration.
   lint-rust:

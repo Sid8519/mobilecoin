@@ -52,3 +52,5 @@ runs:
         name: core_dumps
         path: core.*
         if-no-files-found: ignore
+    - name: Check dirty git
+      uses: ./.github/actions/check-dirty-git
