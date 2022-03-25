@@ -48,7 +48,8 @@ runs:
         echo 'RUST_BACKTRACE=1' >> $GITHUB_ENV
         echo 'SKIP_SLOW_TESTS=1' >> $GITHUB_ENV
         # Link with LLD (and include other rustflags from .cargo/config)
-        echo "RUSTFLAGS='-D warnings -C target-cpu=skylake -C link-arg=-fuse-ld=lld'" >> $GITHUB_ENV
+        # NB: Quoting doesn't work as one might expect.
+        echo "RUSTFLAGS=-D warnings -C target-cpu=skylake -C link-arg=-fuse-ld=lld" >> $GITHUB_ENV
 
         HOST_TARGET_TRIPLE="$(rustc -Vv | sed -n 's/^host: //p')"
         echo "HOST_TARGET_TRIPLE=$HOST_TARGET_TRIPLE" >> $GITHUB_ENV
