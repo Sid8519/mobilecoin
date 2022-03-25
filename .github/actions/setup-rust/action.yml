@@ -53,6 +53,3 @@ runs:
         echo "HOST_TARGET_TRIPLE=$HOST_TARGET_TRIPLE" >> $ENV_FILE
         # Set HOST_TARGET_TRIPLE as the default build target.
         echo "CARGO_BUILD_TARGET=$HOST_TARGET_TRIPLE" >> $ENV_FILE
-    - name: Setup sccache
-      if: ${{ inputs.sccache }} && false
-      uses: ./.github/actions/sccache
