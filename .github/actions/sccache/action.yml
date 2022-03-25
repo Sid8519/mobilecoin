@@ -9,7 +9,7 @@ runs:
     - name: Cache sccache dir
       uses: actions/cache@v3
       with:
-        path: /home/runner/.cache/sccache
+        path: /tmp/sccache
         key: v1-sccache-${{ runner.os }}-${{ hashFiles('rust-toolchain') }}-${{ hashFiles('**/Cargo.lock') }}
         restore-keys: |
           v1-sccache-${{ runner.os }}-${{ hashFiles('rust-toolchain') }}
@@ -28,7 +28,7 @@ runs:
         # sccache doesn't support incremental building
         echo 'CARGO_INCREMENTAL=0' >> $GITHUB_ENV
         # Set cache dir explicitly so that all platforms use the same location
-        echo 'SCCACHE_DIR=$HOME/.cache/sccache' >> $GITHUB_ENV
+        echo 'SCCACHE_DIR=/tmp/sccache' >> $GITHUB_ENV
         # Tune some params
         echo 'SCCACHE_IDLE_TIMEOUT=1200' >> $GITHUB_ENV
         echo 'SCCACHE_CACHE_SIZE=10G' >> $GITHUB_ENV
