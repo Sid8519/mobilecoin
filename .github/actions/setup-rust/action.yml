@@ -45,6 +45,7 @@ runs:
         # build config
         echo 'IAS_MODE=DEV' >> $ENV_FILE
         echo 'SGX_MODE=SW' >> $ENV_FILE
+        echo 'source /opt/intel/sgxsdk/environment' >> $ENV_FILE
         # test/run config
         echo 'RUST_BACKTRACE=1' >> $ENV_FILE
         echo 'SKIP_SLOW_TESTS=1' >> $ENV_FILE
@@ -53,3 +54,14 @@ runs:
         echo "HOST_TARGET_TRIPLE=$HOST_TARGET_TRIPLE" >> $ENV_FILE
         # Set HOST_TARGET_TRIPLE as the default build target.
         echo "CARGO_BUILD_TARGET=$HOST_TARGET_TRIPLE" >> $ENV_FILE
+    - name: Install SGX
+      shell: bash
+      run: |
+        [[ -d /opt/intel/sgxsdk ]] || sudo ./docker/install_sgx.sh
+        # Ideally we'd just add "source /opt/intel/sgxsdk/environment" to
+        # GITHUB_ENV, but it has a custom parser that rejects that.
+        source /opt/intel/sgxsdk/environment
+        echo "PKG_CONFIG_PATH=$PKG_CONFIG_PATH" >> $GITHUB_ENV
+        echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH" >> $GITHUB_ENV
+        echo "$SGX_SDK/bin" >> $GITHUB_PATH
+        echo "$SGX_SDK/bin/x64" >> $GITHUB_PATH
