@@ -52,7 +52,7 @@ def parse_args() -> argparse.ArgumentParser:
     return parser.parse_args()
 
 def read_file(path):
-    with file as open(path, "r"):
+    with open(path, "r") as file:
         return file.read()
 
 def run_test(stub, amount, monitor_id, dest, max_seconds):
