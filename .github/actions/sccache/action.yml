@@ -4,10 +4,8 @@ runs:
   using: composite
   steps:
     - name: Install sccache
-      uses: actions-rs/install@v0.1
-      with:
-        crate: sccache
-        use-tool-cache: true
+      shell: bash
+      run: sudo snap install sccache --candidate --classic
     - name: Cache sccache dir
       uses: actions/cache@v3
       with:
