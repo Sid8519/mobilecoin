@@ -24,7 +24,7 @@ runs:
         ulimit -c unlimited
 
         # Run tests, with JUnit XML output configured via .config/nextest.toml
-        cargo nextest run --workspace --tests -p "${{ inputs.package }}" -j 4 \
+        cargo nextest run --workspace -p "${{ inputs.package }}" -j 4 \
           --profile ci ${{ inputs.extra_args }}
     - name: Collect core dumps
       uses: actions/upload-artifact@v3
