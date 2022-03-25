@@ -21,7 +21,7 @@ import mobilecoind_api_pb2
 import mobilecoind_api_pb2_grpc
 import os
 import time
-from accounts import *
+from accounts import wait_for_accounts_sync
 from google.protobuf.empty_pb2 import Empty
 
 
