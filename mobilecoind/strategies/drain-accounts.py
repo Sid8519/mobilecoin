@@ -51,6 +51,9 @@ def parse_args() -> argparse.ArgumentParser:
                         help="Amount less than the balance that we attempt to send")
     return parser.parse_args()
 
+def read_file(path):
+    with file as open(path, "r"):
+        return file.read()
 
 def run_test(stub, amount, monitor_id, dest, max_seconds):
     resp = stub.GetBalance(
@@ -102,9 +105,8 @@ if __name__ == '__main__':
     ]
 
     dest_addresses = [
-        with b58_pubfile as open(k, "r"):
-            b58_pubfile.read()
-        for k in sorted(
+        readfile(b58pubfile)
+        for b58pubfile in sorted(
             filter(lambda x: x.endswith(".b58pub"), os.listdir(args.key_dir)))
     ]
 
